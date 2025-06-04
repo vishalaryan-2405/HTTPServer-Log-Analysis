@@ -1,0 +1,110 @@
+
+Web Server Log Analysis Project – Full Explanation
+
+1. What is the Use of Web Server Log Analysis?
+
+Web server logs are automatically generated files that store detailed records of every request made to a website or web server. These logs are critical for understanding how a server is being accessed.
+
+Key uses of web log analysis:
+- Monitor traffic and visitor patterns
+- Detect errors like 404 (Not Found) and server issues
+- Measure server load and bandwidth usage
+- Identify suspicious or malicious activities
+- Optimize resources and improve performance
+
+2. Project Objective
+
+The goal is to analyze the Calgary HTTP web server logs to gain insights such as:
+- Total requests made
+- Number of unique users (hosts)
+- Patterns in file access
+- Error trends (like 404 errors)
+- Bandwidth consumption
+
+3. Tools and Technologies Used
+
+| Tool        | Purpose                          |
+|-------------|----------------------------------|
+| Python      | Main programming language        |
+| Pandas      | Data manipulation and analysis   |
+| Regex       | Parsing raw log text             |
+| Matplotlib / Seaborn (optional) | For visualizations |
+| Gzip        | Reading compressed .gz files     |
+
+4. Step-by-Step Process
+
+Step 1: Downloading and Reading the Data
+We downloaded the calgary_access_log.gz file and used Python’s gzip module to open and read all the log lines.
+=> Loaded 726,739 log entries.
+
+Step 2: Parsing the Logs
+We used regular expressions (re module) to extract structured information from each log entry.
+Parsed fields:
+- host
+- datetime
+- method
+- filename
+- protocol
+- status (HTTP response code)
+- bytes (bandwidth used)
+
+Regex pattern: r'(\S+) - - \[(.*?)\] "(.*?)" (\d{3}) (\S+)'
+
+Step 3: Structuring and Cleaning the Data
+We converted the extracted values into a Pandas DataFrame and cleaned the data:
+- Converted datetime to proper format
+- Converted status and bytes to integers
+- Filled missing or invalid values
+- Extracted: date_str, hour, ext
+
+5. Answering the 10 Questions
+
+Q1: Total Log Records
+df.shape[0]
+
+Q2: Unique Hosts
+df['host'].nunique()
+
+Q3: Unique Filenames by Date
+df.groupby('date_str')['filename'].nunique().to_dict()
+
+Q4: Number of 404 Errors
+df[df['status'] == 404].shape[0]
+
+Q5: Top 15 Filenames Causing 404 Errors
+df[df['status'] == 404]['filename'].value_counts().head(15)
+
+Q6: Top 15 File Extensions with 404 Errors
+df[df['status'] == 404]['ext'].value_counts().head(15)
+
+Q7: Bandwidth Usage Per Day in July 1995
+july_df = df[(df['datetime'].dt.month == 7) & (df['datetime'].dt.year == 1995)]
+july_df['bytes'] = pd.to_numeric(july_df['bytes'], errors='coerce').fillna(0).astype(int)
+july_df.groupby('date_str')['bytes'].sum().to_dict()
+
+Q8: Hourly Request Distribution
+df['hour'].value_counts().sort_index().to_dict()
+
+Q9: Top 10 Most Requested Filenames
+df['filename'].value_counts().head(10)
+
+Q10: HTTP Status Code Distribution
+df['status'].value_counts().sort_index().to_dict()
+
+6. Packaging the Results
+
+We created and saved the following files for submission:
+- analysis.ipynb – Full notebook with code and outputs
+- analysis.html – Exported notebook in HTML format
+- transcript.txt – Complete explanation in plain text
+- calgary-http-assessment.zip – All files zipped together
+
+7. For the Video Explanation
+
+Explain:
+- What are log files and their importance
+- What data you used and how you loaded it
+- How you cleaned and structured it
+- How each question was answered using Python
+- What insights were gained (most common files, 404 errors, bandwidth, etc.)
+- Final outcome and files submitted
